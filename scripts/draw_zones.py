@@ -78,7 +78,7 @@ def redraw(image: np.ndarray, original_image: np.ndarray) -> None:
                 color=color,
                 thickness=THICKNESS,
             )
-    #cv2.imshow(WINDOW_NAME, image)
+    cv2.imshow(WINDOW_NAME, image)
 
 
 def close_and_finalize_polygon(image: np.ndarray, original_image: np.ndarray) -> None:
@@ -93,7 +93,7 @@ def close_and_finalize_polygon(image: np.ndarray, original_image: np.ndarray) ->
     POLYGONS.append([])
     image[:] = original_image.copy()
     redraw_polygons(image)
-    #cv2.imshow(WINDOW_NAME, image)
+    cv2.imshow(WINDOW_NAME, image)
 
 
 def redraw_polygons(image: np.ndarray) -> None:
@@ -131,7 +131,7 @@ def main(source_path: str, zone_configuration_path: str) -> None:
         return
 
     image = original_image.copy()
-    #cv2.imshow(WINDOW_NAME, image)
+    cv2.imshow(WINDOW_NAME, image)
     cv2.setMouseCallback(WINDOW_NAME, mouse_event, image)
 
     while True:
