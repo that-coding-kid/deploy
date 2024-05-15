@@ -110,22 +110,20 @@ elif source_radio == settings.ENCROACHMENT:
     cmd = [
     "python",
     "scripts/draw_zones.py",
-    "--source_path", "videos/video_1.mp4",
+    "--source_path", "videos/video.mp4",
     "--zone_configuration_path", "configure/config.json"
 ]
 
     subprocess.run(cmd)
     cmd = [
         "python",
-        "ultralytics_file_example.py",
+        "inference_file_example.py",
         "--zone_configuration_path", "configure/config.json",
-        "--source_video_path", "videos/video_1.mp4",
-        "--weights", "weights/yolov8n.pt",
-        "--device", "cpu",
-        "--classes", "2", "5", "6", "7",
+        "--source_video_path", "videos/video_3.mp4",
+        "--model_id" ,"yolov8x-640",
+        "--classes", "2","5","6","7",
         "--confidence_threshold", "0.3",
         "--iou_threshold", "0.7"
-        
     ]
 
     subprocess.run(cmd)
