@@ -38,6 +38,7 @@ nvidia-cusparse-cu12
 nvidia-nvjitlink-cu12
 nvidia-nvtx-cu12
 opencv-python==4.8.0.76
+opencv-python-headless==4.8.0.76
 packaging==23.2
 pandas==2.2.1
 pillow==10.2.0
@@ -75,7 +76,6 @@ tzdata==2024.1
 ultralytics==8.1.30
 urllib3==2.2.1
 watchdog==4.0.0
-opencv-python==4.8.0.76
 supervision
 ultralytics
 inference
