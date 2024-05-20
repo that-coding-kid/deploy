@@ -552,7 +552,6 @@ def timedetect(source_path, zone_configuration_path, violation_time):
                                    channels="BGR",
                                    use_column_width=True)
                     vid_cap.release()
-                    cv2.destroyAllWindows()
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
     
