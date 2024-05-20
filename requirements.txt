@@ -80,3 +80,4 @@ supervision
 ultralytics
 inference
 pytube
+ffmpeg
