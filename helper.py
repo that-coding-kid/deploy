@@ -326,7 +326,7 @@ def enchroachment():
         if(source_url): 
             livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path="configure/config.json")
         else:
-            drawzones(source_path = source_path, zone_configuration_path = "configure/config.json")
+            #drawzones(source_path = source_path, zone_configuration_path = "configure/config.json")
             timedetect(source_path = source_path, zone_configuration_path = "configure/config.json", violation_time=time)
         
 def junctionEvaluationDataset():
