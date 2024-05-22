@@ -160,7 +160,7 @@ def updateDirectories():
         print(i,VIDEOS_DICT[i])
 
 
-    EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset'
+    EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset/mount/src/deploy/videos/'
     for filename in os.listdir(EVALUATION_DIR):
         f = os.path.join(EVALUATION_DIR, filename)
         if (len(f)<5):
