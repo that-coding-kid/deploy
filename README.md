@@ -75,7 +75,8 @@ Videos can have various objects detected within themselves with varying level of
 
 
 #### Result
-![video](vid_result.mp4)
+![vid_pre](https://github.com/that-coding-kid/deploy/assets/120120491/b673e371-c2ec-435c-b1e7-8a1b445fc111)
+
 
 ### Webcam Detection
 
