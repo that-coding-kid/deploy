@@ -33,6 +33,8 @@ The proposed solution is an object detection-based system using computer vision 
   ```
   streamlit run app.py
   ```
+
+  *In helper.py there's a function known as drawzones, having the repository cloned on local machine allows you to access it, just open helper.py and search for enchroachment function and uncomment the drawzones function.
   
   
 - Web
