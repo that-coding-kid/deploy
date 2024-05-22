@@ -11,7 +11,8 @@ import argparse
 import json
 import os
 from typing import Any, Optional, Tuple
-
+import shutil
+import sys
 import cv2
 import numpy as np
 from inference import get_roboflow_model
@@ -20,6 +21,9 @@ from utils.timers import FPSBasedTimer
 from inference import InferencePipeline
 from inference.core.interfaces.camera.entities import VideoFrame
 from utils.timers import ClockBasedTimer
+from scripts.jxnEvalDataCreation import mainFunc
+from scripts.jxnEvaluator import jxnEvalFunc
+
 
 import supervision as sv
 
@@ -108,7 +112,32 @@ class CustomSink:
             )
         cv2.imshow("Processed Video", annotated_frame)
         cv2.waitKey(1)
+
+class JunctionEvaluation:
+    
+    def __init__(self,sourcePath):
+        self.sourcePath = sourcePath
+        pass
+    
+    def datasetCreation(self,cycle):
+        savePath = "videos/junctionEvalDataset/"
+        print("ABC\n\n\n\n\n\n\n\n"+self.sourcePath)
+        videoName = self.sourcePath[self.sourcePath.rfind("\\")+1:]
+        videoName = videoName[:-4]
+        finalpath = savePath+videoName+"Clips"
+        isExist = os.path.exists(finalpath)
+        if (isExist):
+            shutil.rmtree(finalpath)
+        os.makedirs(finalpath)
+        mainFunc(self.sourcePath,cycle,finalpath)
+        settings.updateDirectories()
+        return finalpath
+            
         
+def startup():
+    settings.updateDirectories()
+
+         
 def load_model(model_path):
     """
     Loads a YOLO object detection model from the specified model_path.
@@ -294,11 +323,112 @@ def enchroachment():
     source_url = st.sidebar.text_input("Source Url:")
     
     if st.sidebar.button("Generate Bottleneck Alerts"):
-        if(source_url):
+        if(source_url): 
             livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path="configure/config.json")
         else:
-            #drawzones(source_path = source_path, zone_configuration_path = "configure/config.json")
+            drawzones(source_path = source_path, zone_configuration_path = "configure/config.json")
             timedetect(source_path = source_path, zone_configuration_path = "configure/config.json", violation_time=time)
+        
+def junctionEvaluationDataset():
+    source_vid = st.sidebar.selectbox(
+    "Choose a video...", settings.VIDEOS_DICT.keys())
+    source_path = str(settings.VIDEOS_DICT.get(source_vid))
+
+    successVar = False
+    cycle = []
+    try:
+        cycle = st.sidebar.text_input("Cycle")
+        cycle = cycle.split()
+        cycle = [int (i) for i in cycle]
+        successVar = True
+    except:
+        pass
+    # time = st.sidebar.text_input("Violation Time:")
+    #source_url = st.sidebar.text_input("Source Url:")
+    
+    if st.sidebar.button("Create Dataset"):
+        if (successVar == False):
+            st.sidebar.error("Invalid cycle syntax")
+            pass
+        else:
+            jxnEvalInstance = JunctionEvaluation(source_path)
+            returnPath = jxnEvalInstance.datasetCreation(cycle=cycle)
+            st.sidebar.write("Dataset Created Successfully at "+returnPath)
+            
+def BenchMarking():
+
+
+    source_vid = st.sidebar.selectbox(
+        "Choose a video...", settings.VIDEOS_DICT.keys())
+
+    is_display_tracker, tracker = display_tracker_options()
+
+    with open(settings.VIDEOS_DICT[source_vid], 'rb') as video_file:
+        video_bytes = video_file.read()
+    if video_bytes:
+        st.video(video_bytes)
+
+    # try:
+    #     threshold = int(threshold)
+    #     if (threshold > 5 or threshold < 1):
+    #         st.sidebar.error("Enter a valid value")
+    #     else:
+    #         if st.sidebar.button("Start Evaluation"):
+    #             returnVid = jxnEvalFunc(threshold)
+    #             is_display_tracker, tracker = display_tracker_options()
+
+    #             with open(returnVid, 'rb') as video_file:
+    #                 video_bytes = video_file.read()
+                    
+    #             if video_bytes:
+    #                 st.video(video_bytes)
+                                                        
+    # except:
+    #     st.sidebar.error("Enter a valid integer")            
+        
+            
+            
+        
+def junctionEvaluation():
+    if (len(settings.EVALUATION_DICT.keys()) == 0):
+        st.sidebar.error("Create a dataset first")
+    else:
+        source_dir = st.sidebar.selectbox(
+        "Choose a folder", settings.EVALUATION_DICT.keys())
+        
+        source_path = str(settings.EVALUATION_DICT.get(source_dir))
+        source_vid = st.sidebar.selectbox(
+        "Choose a clip", settings.FINAL_DICT[source_dir].keys())
+        
+        
+        with open("videos/JunctionEvalDataset/"+source_dir+"/"+source_vid, 'rb') as video_file:
+            video_bytes = video_file.read()
+        if video_bytes:
+            st.video(video_bytes)
+
+        threshold = st.sidebar.text_input(
+            "Enter a integer in range 1-5"
+        )
+
+        try:
+            
+            threshold = int(threshold)
+            if (threshold > 5 or threshold < 1):
+                st.sidebar.error("Enter a valid value")
+            else:
+                if st.sidebar.button("Start Evaluation"):
+                    returnVid = "videos/JunctionEvaluations/IndiraNagarClips/clip1.mp4"
+                    with open(returnVid, 'rb') as video_file2:
+                        video_bytes2 = video_file2.read()
+                        
+                    if video_bytes2:
+                        st.video(video_bytes2)
+                    
+                                                            
+        except:
+            st.sidebar.error("Enter a valid integer")            
+            
+            
         
 
 def play_stored_video(conf, model):
@@ -320,7 +450,7 @@ def play_stored_video(conf, model):
 
     is_display_tracker, tracker = display_tracker_options()
 
-    with open(settings.VIDEOS_DICT.get(source_vid), 'rb') as video_file:
+    with open(settings.VIDEOS_DICT[source_vid], 'rb') as video_file:
         video_bytes = video_file.read()
     if video_bytes:
         st.video(video_bytes)
@@ -439,7 +569,7 @@ def drawzones(source_path, zone_configuration_path):
         redraw_polygons(image)
         cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
         cv2.imshow(WINDOW_NAME, image)
-    
+
     def save_polygons_to_json(polygons, target_path):
         data_to_save = polygons if polygons[-1] else polygons[:-1]
         with open(target_path, "w") as f:
@@ -528,7 +658,7 @@ def timedetect(source_path, zone_configuration_path, violation_time):
                             )
                             labels = [
                                 f"#{tracker_id} {int(time // 60):02d}:{int(time % 60):02d}"
-                                for tracker_id, time in zip(detections_in_zone.tracker_id, time_in_zone)
+                                for tracker_id, time in zip(detections_in_zone.tracker_id, time_in_zone)     
                             ]
 
                             annotated_frame = LABEL_ANNOTATOR.annotate(
@@ -580,3 +710,30 @@ def livedetection(source_url: str, violation_time: int, zone_configuration_path:
         pipeline.join()
     except KeyboardInterrupt:
         pipeline.terminate()
+        
+        
+    
+def liveevaluation(source_url: str, zone_configuration_path: str):
+    model_id = 'yolov8x-640'
+    classes = [2,5,6,7]
+    confidence = 0.3
+    iou = 0.7
+    model = YOLO('weights\yolov8n.pt')
+    sink = CustomSink(zone_configuration_path=zone_configuration_path, classes=classes, violation_time = violation_time)
+
+    pipeline = InferencePipeline.init(
+        model_id=model_id,
+        video_reference=source_url,
+        on_prediction=sink.on_prediction,
+        confidence=confidence,
+        iou_threshold=iou,
+    )
+
+    pipeline.start()
+
+    try:
+        pipeline.join()
+    except KeyboardInterrupt:
+        pipeline.terminate()
+
+
