@@ -78,29 +78,35 @@ Videos can have various objects detected within themselves with varying level of
 https://github.com/that-coding-kid/deploy/assets/120120491/f07bb3d4-3d74-468d-ac82-2682d6e00eda
 
 
-
-
-
 ### Webcam Detection
+This is a test feature to demonstrate the real time object detection capibilities of the project.
+https://github.com/that-coding-kid/deploy/assets/120120491/d2b49e8d-fb67-4438-a023-1905f083357a
+
 
 
 ### RTSP Detection
+This takes in input as rtsp url of the source camera provided and provide detection analysis in real time.
+
+#### Result
+
+
+https://github.com/that-coding-kid/deploy/assets/120120491/85036508-7631-4531-9ad7-c591140f85df
 
 
 
 ### Youtube Detection
+We have created a feature to demonstrate the approach, just type in the source url of the youtube video you wish to see and it'll provide a detection analysis for the same in real time. This works similar to rtsp feature.
 
+
+#### Result
 
 
 ### Bottleneck Dectection
 Only the vehicles and other bottlenecks inside the marked areas are tracked, and a wait-time period is generated for them. If a vehicles stays within the marked area for longer than the permissible duration an alert is genrated for communicationg the control room.
 
-#### Selecting live footage source
-
-#### Darwing zones
-
 #### Result
 
+https://github.com/that-coding-kid/deploy/assets/120120491/f79faf0a-8d47-4dbe-8f6b-b6753c49196c
 
 
 ### Showing Real Time annotation for Traffic Density Estimation and congestion Evaluation
