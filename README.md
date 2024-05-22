@@ -100,9 +100,6 @@ https://github.com/that-coding-kid/deploy/assets/120120491/85036508-7631-4531-9a
 We have created a feature to demonstrate the approach, just type in the source url of the youtube video you wish to see and it'll provide a detection analysis for the same in real time. This works similar to rtsp feature.
 
 
-#### Result
-
-
 ### Bottleneck Dectection
 Only the vehicles and other bottlenecks inside the marked areas are tracked, and a wait-time period is generated for them. If a vehicles stays within the marked area for longer than the permissible duration an alert is genrated for communicationg the control room.
 
