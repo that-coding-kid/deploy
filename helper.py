@@ -401,7 +401,7 @@ def junctionEvaluation():
         "Choose a clip", settings.FINAL_DICT[source_dir].keys())
         
         
-        with open("videos/JunctionEvalDataset/"+source_dir+"/"+source_vid, 'rb') as video_file:
+        with open("videos/junctionEvalDataset//mount/src/deploy/videos/"+source_vid, 'rb') as video_file:
             video_bytes = video_file.read()
         if video_bytes:
             st.video(video_bytes)
