@@ -390,7 +390,7 @@ def BenchMarking():
             
         
 def junctionEvaluation():
-    if (len(settings.EVALUATION_DICT.keys()) == 0):
+    if (len("videos/junctionEvalDataset//mount/src/deploy/videos/"+str(settings.EVALUATION_DICT.get(source_dir))) == 0):
         st.sidebar.error("Create a dataset first")
     else:
         source_dir = st.sidebar.selectbox(
