@@ -673,7 +673,12 @@ def timedetect(source_path, zone_configuration_path, violation_time):
                                     if(time%60 >= int(violation_time)):
                                         violations.append(tracker_ID)
                                         cla = settings.CLASSES[cl]
-                                        s = "Tracker_ID:" + str(tracker_ID) + " Class: " + cla + " Location: CrossingX "
+                                        try:
+                                            vid = ffmpeg.probe(source_path)
+                                            location = vid["location"]
+                                        except:
+                                            location = "Meta data doesn't contain location"
+                                        s = "Tracker_ID:" + str(tracker_ID) + " Class: " + cla + " Location: " + location
                                         st.warning(s, icon= "⚠️")
                                         displayed[tracker_ID] = 1
                         
