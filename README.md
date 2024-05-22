@@ -75,7 +75,8 @@ Videos can have various objects detected within themselves with varying level of
 
 
 #### Result
-https://github.com/that-coding-kid/deploy/assets/120120491/0bb4b9b2-1991-4723-b98b-24c080fd2503
+https://github.com/that-coding-kid/deploy/assets/120120491/f07bb3d4-3d74-468d-ac82-2682d6e00eda
+
 
 
 
