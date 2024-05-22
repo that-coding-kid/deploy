@@ -10,6 +10,8 @@ This repository contains our solution for the Karnataka State Police Hackathon: 
 Urban traffic congestion leads to economic losses, environmental impact, and decreased quality of life. Traditional traffic management methods are often limited in effectiveness.  
 
 Problem Statement 1 - Evaluating the traffic congestion shown by map engine services against the calculated actual congestion using the Drone.
+Problem Statement 2 - Evaluating various junctions after optimal signal time is acheived.
+Problem Statement 3 - Detecting various bottlenecks and generating alerts in regard to them.
 
 ## Solution
 
@@ -17,6 +19,23 @@ The proposed solution is an object detection-based system using computer vision 
 
 ![image](https://github.com/Dev-on-go/S.A.D.A.K/assets/120119971/120599b9-5b57-4677-924e-7a0a3f4d21ef)
 *Several Modules in this proposed solution still need to be worked upon
+
+## Setup
+- Local Machine
+  Clone the repository on to you local machine.
+  Run the command in cmd -
+  '''
+  pip install -r requirements.txt
+  '''
+  The above ensure all the required dependecies are installed.
+
+  Followed by -
+  '''
+  streamlit run app.py
+  '''
+  
+  
+- Web
 
 ## Screenshots
 
