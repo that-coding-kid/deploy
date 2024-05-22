@@ -396,7 +396,7 @@ def junctionEvaluation():
         source_dir = st.sidebar.selectbox(
         "Choose a folder", settings.EVALUATION_DICT.keys())
         
-        source_path = str(settings.EVALUATION_DICT.get("videos/junctionEvalDataset//mount/src/deploy/videos/"+source_vid))
+        source_path = str(settings.EVALUATION_DICT.get("videos/junctionEvalDataset//mount/src/deploy/videos/"+str(source_vid)))
         source_vid = st.sidebar.selectbox(
         "Choose a clip", settings.FINAL_DICT[source_dir].keys())
         
