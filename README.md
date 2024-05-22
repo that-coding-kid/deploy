@@ -9,9 +9,9 @@ This repository contains our solution for the Karnataka State Police Hackathon: 
 
 Urban traffic congestion leads to economic losses, environmental impact, and decreased quality of life. Traditional traffic management methods are often limited in effectiveness.  
 
-Problem Statement 1 - Evaluating the traffic congestion shown by map engine services against the calculated actual congestion using the Drone.
-Problem Statement 2 - Evaluating various junctions after optimal signal time is acheived.
-Problem Statement 3 - Detecting various bottlenecks and generating alerts in regard to them.
+-Sub-Problem Statement 1 - Evaluating the traffic congestion shown by map engine services against the calculated actual congestion using the Drone.
+-Sub-Problem Statement 2 - Evaluating various junctions after optimal signal time is acheived.
+-Sub-Problem Statement 3 - Detecting various bottlenecks and generating alerts in regard to them.
 
 ## Solution
 
@@ -34,10 +34,25 @@ The proposed solution is an object detection-based system using computer vision 
   streamlit run app.py
   ```
 
-  *In helper.py there's a function known as drawzones, having the repository cloned on local machine allows you to access it, just open helper.py and search for enchroachment function and uncomment the drawzones function.
+  **In helper.py there's a function known as drawzones, having the repository cloned on local machine allows you to access it, just open helper.py and search for enchroachment function and uncomment the drawzones function.**
   
   
 - Web
+  Just vist the product link mentioned at the start of the repository.
+
+## Functions
+- Navigation
+  The page consists of a main section along with a side bar, it is in this side bar that you can access numerous facilities provided by the product:
+  - Image Detection
+  - Video Detection
+  - Webcam Detection
+  - RTSP Detection and Classification
+  - Youtube Detection and Classification
+  - Enchroachment Indentification and Alerts
+  - Junction Evaluation Dataset Generator
+  - Junction Evaluator
+  - Benchmarking
+  
 
 ## Screenshots
 
