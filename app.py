@@ -113,6 +113,6 @@ elif source_radio == settings.JUNCTION:
 elif source_radio == settings.JUNCTIONEVAL:
     helper.junctionEvaluation()
 elif source_radio == settings.BENCHMARKING:
-    helper.benchMarking()
+    helper.BenchMarking()
 else:
     st.error("Please select a valid source type!")
