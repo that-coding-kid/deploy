@@ -80,7 +80,9 @@ https://github.com/that-coding-kid/deploy/assets/120120491/f07bb3d4-3d74-468d-ac
 
 ### Webcam Detection
 This is a test feature to demonstrate the real time object detection capibilities of the project.
-https://github.com/that-coding-kid/deploy/assets/120120491/d2b49e8d-fb67-4438-a023-1905f083357a
+
+https://github.com/that-coding-kid/deploy/assets/120120491/f425f00e-8ba8-42fe-a59d-5dd318c52270
+
 
 
 
