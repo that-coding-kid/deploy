@@ -4,7 +4,7 @@
 # Traffic Flow Optimization and Congestion Management Tool - S.A.D.A.K
 
 This repository contains our solution for the Karnataka State Police Hackathon: "Datathon"
-![App Screenshot](cover.jpeg)
+![App Screenshot](cover.png)
 ## Problem
 
 Urban traffic congestion leads to economic losses, environmental impact, and decreased quality of life. Traditional traffic management methods are often limited in effectiveness.  
