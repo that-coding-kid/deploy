@@ -163,8 +163,13 @@ def updateDirectories():
     EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset'
     for filename in os.listdir(EVALUATION_DIR):
         f = os.path.join(EVALUATION_DIR, filename)
-        # checking if it is a file
-        EVALUATION_DICT[filename] = f
+        if (len(f)<5):
+            continue
+        else:
+            if (f[-4] != "."):
+                pass
+            else:
+                EVALUATION_DICT[filename] = f
 
     for i in EVALUATION_DICT.keys():
         print(i,EVALUATION_DICT[i])
