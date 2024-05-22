@@ -398,10 +398,10 @@ def junctionEvaluation():
         
         source_path = str(settings.EVALUATION_DICT.get(source_dir))
         source_vid = st.sidebar.selectbox(
-        "Choose a clip", settings.FINAL_DICT["videos/junctionEvalDataset//mount/src/deploy/videos/"].keys())
+        "Choose a clip", settings.FINAL_DICT["videos/junctionEvalDataset/mount/src/deploy/videos/"].keys())
         
         
-        with open("videos/junctionEvalDataset//mount/src/deploy/videos/"+source_vid, 'rb') as video_file:
+        with open("videos/junctionEvalDataset/mount/src/deploy/videos/"+source_vid, 'rb') as video_file:
             video_bytes = video_file.read()
         if video_bytes:
             st.video(video_bytes)
