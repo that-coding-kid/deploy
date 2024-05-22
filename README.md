@@ -24,15 +24,15 @@ The proposed solution is an object detection-based system using computer vision 
 - Local Machine
   Clone the repository on to you local machine.
   Run the command in cmd -
-  '''
+  ```
   pip install -r requirements.txt
-  '''
+  ```
   The above ensure all the required dependecies are installed.
 
   Followed by -
-  '''
+  ```
   streamlit run app.py
-  '''
+  ```
   
   
 - Web
