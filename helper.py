@@ -390,7 +390,7 @@ def BenchMarking():
             
         
 def junctionEvaluation():
-    if (len("videos/junctionEvalDataset//mount/src/deploy/videos/") == 0 & 0 ):
+    if (len(settings.EVALUATION_DICT.keys()) == 0 ):
         st.sidebar.error("Create a dataset first")
     else:
         source_dir = st.sidebar.selectbox(
@@ -401,7 +401,7 @@ def junctionEvaluation():
         "Choose a clip", settings.FINAL_DICT[source_dir].keys())
         
         
-        with open(videos/JunctionEvalDataset/"+source_dir+"/"+source_vid, 'rb') as video_file:
+        with open("videos/JunctionEvalDataset/"+source_dir+"/"+source_vid, 'rb') as video_file:
             video_bytes = video_file.read()
         if video_bytes:
             st.video(video_bytes)
