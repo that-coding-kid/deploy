@@ -1,7 +1,7 @@
 from pathlib import Path
 import sys
 import supervision as sv
-
+import os
 # Get the absolute path of the current file
 FILE = Path(__file__).resolve()
 # Get the parent directory of the current file
@@ -18,40 +18,19 @@ WEBCAM = 'Webcam'
 RTSP = 'RTSP'
 YOUTUBE = 'YouTube'
 ENCROACHMENT = 'Encroachment'
-JUNCTION = 'Junction Evaluation'
-
-SOURCES_LIST = [IMAGE, VIDEO, WEBCAM, RTSP, YOUTUBE, ENCROACHMENT, JUNCTION]
+JUNCTION = 'Junction Evaluation Dataset'
+JUNCTIONEVAL = 'Junction Evaluation'
+BENCHMARKING = "Benchmarking"
+SOURCES_LIST = [IMAGE, VIDEO, WEBCAM, RTSP, YOUTUBE, ENCROACHMENT, JUNCTION, JUNCTIONEVAL,BENCHMARKING]
 
 # Images config
 IMAGES_DIR = ROOT / 'images'
 DEFAULT_IMAGE = IMAGES_DIR / 'office_4.jpg'
 DEFAULT_DETECT_IMAGE = IMAGES_DIR / 'office_4_detected.jpg'
 
-# Videos config
-VIDEO_DIR = ROOT / 'videos'
-VIDEOS_DICT = {
-    'video_1': VIDEO_DIR /'video_1.mp4',
-    'video_2': VIDEO_DIR /'video_2.mp4',
-    'video_3': VIDEO_DIR /'video_3.mp4',
-    'video_4': VIDEO_DIR/'video.mp4',
-}
-print (VIDEO_DIR)
-
-# ML Model config
-MODEL_DIR = ROOT /'weights'
-#print(MODEL_DIR)
-DETECTION_MODEL = MODEL_DIR/'yolov8n.pt'
-print(DETECTION_MODEL)
-# In case of your custome model comment out the line above and
-# Place your custom model pt file name at the line below 
-# DETECTION_MODEL = MODEL_DIR / 'my_detection_model.pt'
-
-SEGMENTATION_MODEL = MODEL_DIR / 'yolov8n-seg.pt'
-print(DETECTION_MODEL)
-
-# Webcam
-WEBCAM_PATH = 0
-
+VIDEOS_DICT = {}
+EVALUATION_DICT = {}
+FINAL_DICT = {}
 CLASSES = {0: 'person',
  1: 'bicycle',
  2: 'car',
@@ -132,3 +111,100 @@ CLASSES = {0: 'person',
  77: 'teddy bear',
  78: 'hair drier',
  79: 'toothbrush'}
+ 
+# iterate over files in
+# that directory
+
+    # ML Model config
+MODEL_DIR = ROOT /'weights'
+#print(MODEL_DIR)
+DETECTION_MODEL = MODEL_DIR/'yolov8n.pt'
+print(DETECTION_MODEL)
+# In case of your custome model comment out the line above and
+# Place your custom model pt file name at the line below 
+# DETECTION_MODEL = MODEL_DIR / 'my_detection_model.pt'
+
+SEGMENTATION_MODEL = MODEL_DIR / 'yolov8n-seg.pt'
+print(DETECTION_MODEL)
+
+# Webcam
+WEBCAM_PATH = 0
+
+def updateDirectories():
+        # Videos config
+    global VIDEOS_DICT,EVALUATION_DICT,FINAL_DICT
+    VIDEOS_DICT = {}
+    EVALUATION_DICT = {}
+    FINAL_DICT = {}
+    VIDEO_DIR = ROOT / 'videos'
+
+    # VIDEOS_DICT = {
+    #     'video_1': VIDEO_DIR /'video_1.mp4',
+    #     'video_2': VIDEO_DIR /'video_2.mp4',
+    #     'video_3': VIDEO_DIR /'video_3.mp4',
+    #     'video_4': VIDEO_DIR/'video.mp4',
+    # }
+    # for i in VIDEOS_DICT.keys():
+    #     print(i,VIDEOS_DICT[i])
+    for filename in os.listdir(VIDEO_DIR):
+        f = os.path.join(VIDEO_DIR, filename)
+        # checking if it is a file
+        try:
+            if(filename[-4:]==".mp4" or filename[-4:] == ".AVI"):
+                VIDEOS_DICT[filename] = f
+            else:
+                pass
+        except:
+            pass
+    for i in VIDEOS_DICT.keys():
+        print(i,VIDEOS_DICT[i])
+
+
+    EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset'
+    for filename in os.listdir(EVALUATION_DIR):
+        f = os.path.join(EVALUATION_DIR, filename)
+        # checking if it is a file
+        EVALUATION_DICT[filename] = f
+
+    for i in EVALUATION_DICT.keys():
+        print(i,EVALUATION_DICT[i])
+
+
+    for i in EVALUATION_DICT.keys():
+        newDict = {}
+        for filename in os.listdir(EVALUATION_DICT[i]):
+            f = os.path.join(i, filename)
+            # checking if it is a file
+            try:
+                if(filename[-4:]==".mp4"):
+                    newDict[filename] = f
+                else:
+                    pass
+            except:
+                pass  
+        FINAL_DICT[i] = newDict
+
+
+    # EVALUATION_DICT = {
+    #     'chickPea': EVALUATION_DIR /'chickPea.mp4',
+    # }
+
+    # print (EVALUATION_DICT['chickPea'])
+
+    # ML Model config
+    MODEL_DIR = ROOT /'weights'
+    #print(MODEL_DIR)
+    DETECTION_MODEL = MODEL_DIR/'yolov8n.pt'
+    print(DETECTION_MODEL)
+    # In case of your custome model comment out the line above and
+    # Place your custom model pt file name at the line below 
+    # DETECTION_MODEL = MODEL_DIR / 'my_detection_model.pt'
+
+    SEGMENTATION_MODEL = MODEL_DIR / 'yolov8n-seg.pt'
+    print(DETECTION_MODEL)
+
+    # Webcam
+    WEBCAM_PATH = 0
+
+
+        
