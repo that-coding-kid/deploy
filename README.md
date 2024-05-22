@@ -114,5 +114,12 @@ https://github.com/that-coding-kid/deploy/assets/120120491/f79faf0a-8d47-4dbe-8f
 ### Showing Real Time annotation for Traffic Density Estimation and congestion Evaluation
 Videos are divided into further subclips which are used for dataset creation.  
 We have limited the annotations to vehicles to limit the chances of False positives, this can be improved when scaled further.
+
+### Result
+#### Image
 ![image](https://github.com/Dev-on-go/S.A.D.A.K/assets/120119971/c81c8850-1a2f-4778-9b2e-720754362698)
+#### Video
+https://github.com/that-coding-kid/deploy/assets/120120491/578aae1d-c878-41b0-9d5d-5b58823c25f0
+
+
 
