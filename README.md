@@ -75,7 +75,7 @@ Videos can have various objects detected within themselves with varying level of
 
 
 #### Result
-![video](vid_result.png)
+![video](vid_result.mp4)
 
 ### Webcam Detection
 
