@@ -68,14 +68,39 @@ Images can have various objects detected within themselves with varying level of
 
 ![image](result.png)
 
+### Showing Video Detection
+Videos can have various objects detected within themselves with varying level of confidence, we can set the confidence level and look at the detection results.
+#### Selecting a footage
+![image](vid_pre.png)
+
+
+#### Result
+![video](vid_result.png)
+
+### Webcam Detection
+
+
+### RTSP Detection
+
+
+
+### Youtube Detection
+
+
+
+### Bottleneck Dectection
+Only the vehicles and other bottlenecks inside the marked areas are tracked, and a wait-time period is generated for them. If a vehicles stays within the marked area for longer than the permissible duration an alert is genrated for communicationg the control room.
+
+#### Selecting live footage source
+
+#### Darwing zones
+
+#### Result
+
+
 
 ### Showing Real Time annotation for Traffic Density Estimation and congestion Evaluation
 Videos are divided into further subclips which are used for dataset creation.  
 We have limited the annotations to vehicles to limit the chances of False positives, this can be improved when scaled further.
 ![image](https://github.com/Dev-on-go/S.A.D.A.K/assets/120119971/c81c8850-1a2f-4778-9b2e-720754362698)
-
-### Marking of potential encroachment areas to identify posdible bottlenecks like parking in nearby junction areas
-
-Only the vehicles inside the marked areas are tracked, and a wait-time period is generated for them. If a vehicles stays within the marked area for longer than the permissible duration an alert is genrated for communicationg the control room.
-![image2](https://github.com/that-coding-kid/S.A.D.A.K/assets/120119971/04693fdb-9e43-4186-9f35-3b7d11ee3382)
 
