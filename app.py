@@ -23,7 +23,7 @@ st.title("S.A.D.A.K")
 
 # Sidebar
 st.sidebar.header("Configuration")
-
+helper.startup()
 # Model Options
 model_type = st.sidebar.radio(
     "Select Task", ['Detection', 'Segmentation'])
@@ -109,6 +109,10 @@ elif source_radio == settings.YOUTUBE:
 elif source_radio == settings.ENCROACHMENT:
     helper.enchroachment()
 elif source_radio == settings.JUNCTION:  
-   pass
+    helper.junctionEvaluationDataset()
+elif source_radio == settings.JUNCTIONEVAL:
+    helper.junctionEvaluation()
+elif source_radio == settings.BENCHMARKING:
+    helper.benchMarking()
 else:
     st.error("Please select a valid source type!")
