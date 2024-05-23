@@ -21,7 +21,7 @@ The proposed solution is an object detection-based system using computer vision 
 *Several Modules in this proposed solution still need to be worked upon
 
 ## Setup
-- Local Machine
+- **Local Machine** :
   Clone the repository on to you local machine.
   Run the command in cmd -
   ```
@@ -37,11 +37,11 @@ The proposed solution is an object detection-based system using computer vision 
   **In helper.py there's a function known as drawzones, having the repository cloned on local machine allows you to access it, just open helper.py and search for enchroachment function and uncomment the drawzones function.**
   
   
-- Web
+- **Web** :
   Just vist the product link mentioned at the start of the repository.
 
 ## Functions
-- Navigation
+- **Navigation** :
   The page consists of a main section along with a side bar, it is in this side bar that you can access numerous facilities provided by the product:
   - **Image Detection** - Detection of various objects in the image provide. This can be further extended to track number plates of various violators.
   - **Video Detection** - Detection of various objects in past videos to reconfirm claims made during real time footage.
