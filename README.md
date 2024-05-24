@@ -48,7 +48,7 @@ The proposed solution is an object detection-based system using computer vision 
   - **Webcam Detection** - This is a test feature to demonstrate the real time object detection capibilities of the project.
   - **RTSP Detection and Classification** - This takes in input as rtsp url of the source camera provided and provide detection analysis in real time.
   - **Youtube Detection and Classification** - Due to lack of rtsp urls we have created a feature to demonstrate the approach, just type in the source url of the youtube video you wish to see and it'll provide a detection analysis for the same in real time.
-  - **Enchroachment Indentification and Alerts** - Integrating a custom trained model specificall on UAV imagae datasets and Indian vehicle dataset, the model identifies enchroachment and potential bottle necks in traffic and generate alerts to alert the respective authorities about the same.
+  - **Encroachment Identification and Alerts** - Integrating a custom trained model specificall on UAV imagae datasets and Indian vehicle dataset, the model identifies enchroachment and potential bottle necks in traffic and generate alerts to alert the respective authorities about the same.
   - **Junction Evaluation Dataset Generator**
   - **Junction Evaluator** - It evaluates the performance of the junction once optimal signal time is acheived.
   - **Benchmarking** - It evaluates the traffic congestion shown by map engine services against the calculated actual congestion using the drone to bring into perspective the accuracy of the maps.
