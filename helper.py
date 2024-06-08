@@ -860,7 +860,7 @@ def benchMarking():
     zones_IN_configuration_path = "configure/ZONES_IN"+new_path+".json"
     zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
     cwd = os.getcwd()
-    weight_path = "weights\yolov8n.pt"
+    weight_path = "weights/yolov8n.pt"
     zones_IN_configuration_path = os.path.join(cwd,zones_IN_configuration_path)
     zones_OUT_configuration_path = os.path.join(cwd,zones_OUT_configuration_path)
     weight_path = os.path.join(cwd,weight_path)
