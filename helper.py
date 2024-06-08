@@ -428,14 +428,16 @@ def enchroachment():
     print(source_path)
     time = st.sidebar.text_input("Violation Time:")
     source_url = st.sidebar.text_input("Source Url:")
-
+    cwd = os.getcwd()
     if st.sidebar.button("Generate Bottleneck Alerts"):
         if(source_url): 
             zones_configuration_path = "configure/ZONES"+source_url+".json" 
+            zones_configuration_path = os.path.join(cwd,zones_configuration_path)
             livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path=zones_configuration_path)
         else:
             new_path = source_path.split("\\")[-1]
             zones_configuration_path = "configure/ZONES"+new_path+".json" 
+            zones_configuration_path = os.path.join(cwd,zones_configuration_path)
             if(os.path.exists(zones_configuration_path)):
                 timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
             else:
@@ -465,7 +467,42 @@ def junctionEvaluationDataset():
         else:
             jxnEvalInstance = JunctionEvaluation(source_path)
             returnPath = jxnEvalInstance.datasetCreation(cycle=cycle)
-            st.sidebar.write("Dataset Created Successfully at "+returnPath)        
+            st.sidebar.write("Dataset Created Successfully at "+returnPath)
+            
+def BenchMarking():
+
+
+    source_vid = st.sidebar.selectbox(
+        "Choose a video...", settings.VIDEOS_DICT.keys())
+
+    is_display_tracker, tracker = display_tracker_options()
+
+    with open(settings.VIDEOS_DICT[source_vid], 'rb') as video_file:
+        video_bytes = video_file.read()
+    if video_bytes:
+        st.video(video_bytes)
+
+    # try:
+    #     threshold = int(threshold)
+    #     if (threshold > 5 or threshold < 1):
+    #         st.sidebar.error("Enter a valid value")
+    #     else:
+    #         if st.sidebar.button("Start Evaluation"):
+    #             returnVid = jxnEvalFunc(threshold)
+    #             is_display_tracker, tracker = display_tracker_options()
+
+    #             with open(returnVid, 'rb') as video_file:
+    #                 video_bytes = video_file.read()
+                    
+    #             if video_bytes:
+    #                 st.video(video_bytes)
+                                                        
+    # except:
+    #     st.sidebar.error("Enter a valid integer")            
+        
+            
+            
+        
 def junctionEvaluation():
     if (len(settings.EVALUATION_DICT.keys()) == 0):
         st.sidebar.error("Create a dataset first")
@@ -822,6 +859,11 @@ def benchMarking():
     new_path = source_path.split("\\")[-1]
     zones_IN_configuration_path = "configure/ZONES_IN"+new_path+".json"
     zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
+    cwd = os.getcwd()
+    weight_path = "weights\yolov8n.pt"
+    zones_IN_configuration_path = os.path.join(cwd,zones_IN_configuration_path)
+    zones_OUT_configuration_path = os.path.join(cwd,zones_OUT_configuration_path)
+    weight_path = os.path.join(cwd,weight_path)
     if(st.sidebar.button("Draw Zones IN")):
         drawzones(source_path = source_path, zone_configuration_path = zones_IN_configuration_path)
         st.sidebar.write("ZONES_IN created successfully at "+zones_IN_configuration_path)
@@ -832,7 +874,7 @@ def benchMarking():
 
     if(st.sidebar.button("BenchMark")):
         processor = VideoProcessor(
-        source_weights_path="weights\yolov8n.pt",
+        source_weights_path=weight_path,
         source_video_path=source_path,
         zoneIN_configuration_path=zones_IN_configuration_path,
         zoneOUT_configuration_path=zones_OUT_configuration_path    
