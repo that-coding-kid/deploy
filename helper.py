@@ -861,8 +861,6 @@ def benchMarking():
     zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
     cwd = os.getcwd()
     weight_path = "weights/yolov8n.pt"
-    zones_IN_configuration_path = os.path.join(cwd,zones_IN_configuration_path)
-    zones_OUT_configuration_path = os.path.join(cwd,zones_OUT_configuration_path)
     weight_path = os.path.join(cwd,weight_path)
     if(st.sidebar.button("Draw Zones IN")):
         drawzones(source_path = source_path, zone_configuration_path = zones_IN_configuration_path)
