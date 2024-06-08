@@ -856,7 +856,7 @@ def benchMarking():
     source_vid = st.sidebar.selectbox(
     "Choose a video...", settings.VIDEOS_DICT.keys())
     source_path = str(settings.VIDEOS_DICT.get(source_vid))
-    new_path = source_path.split("\\")[-1]
+    new_path = source_path.split("/")[-1]
     zones_IN_configuration_path = "configure/ZONES_IN"+new_path+".json"
     zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
     cwd = os.getcwd()
