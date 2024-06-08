@@ -1,10 +1,9 @@
 # Python In-built packages
 from pathlib import Path
 import PIL
-import subprocess
-import supervision as sv
 # External packages
 import streamlit as st
+from streamlit_login_auth_ui.widgets import __login__
 
 # Local Modules
 import settings
@@ -12,107 +11,115 @@ import helper
 
 # Setting page layout
 st.set_page_config(
-    page_title="S.A.D.A.K",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# Main page heading
+        page_title="S.A.D.A.K",
+        page_icon="🤖",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
 st.title("S.A.D.A.K")
+__login__obj = __login__(auth_token = "pk_prod_PVY78PYNS84M1SPFKZSCHD1D32BS", 
+                    company_name = "S.A.D.A.K",
+                    width = 200, height = 250, 
+                    logout_button_name = 'Logout', hide_menu_bool = False, 
+                    hide_footer_bool = False, 
+                    lottie_url = 'https://assets2.lottiefiles.com/packages/lf20_jcikwtux.json')
 
-# Sidebar
-st.sidebar.header("Configuration")
-helper.startup()
-# Model Options
-model_type = st.sidebar.radio(
-    "Select Task", ['Detection', 'Segmentation'])
+LOGGED_IN = __login__obj.build_login_ui()
 
-confidence = float(st.sidebar.slider(
-    "Select Model Confidence", 25, 100, 40)) / 100
+if LOGGED_IN == True:
+    # Main page heading
+    # Sidebar
+    st.sidebar.header("Configuration")
+    helper.startup()
+    # Model Options
+    model_type = st.sidebar.radio(
+        "Select Task", ['Detection', 'Segmentation'])
 
-# Selecting Detection Or Segmentation
-if model_type == 'Detection':
-    model_path = Path(settings.DETECTION_MODEL)
-elif model_type == 'Segmentation':
-    model_path = Path(settings.SEGMENTATION_MODEL)
+    confidence = float(st.sidebar.slider(
+        "Select Model Confidence", 25, 100, 40)) / 100
 
-# Load Pre-trained ML Model
-try:
-    model = helper.load_model(model_path)
-except Exception as ex:
-    st.error(f"Unable to load model. Check the specified path: {model_path}")
-    st.error(ex)
+    # Selecting Detection Or Segmentation
+    if model_type == 'Detection':
+        model_path = Path(settings.DETECTION_MODEL)
+    elif model_type == 'Segmentation':
+        model_path = Path(settings.SEGMENTATION_MODEL)
 
-st.sidebar.header("Image/Video Config")
-source_radio = st.sidebar.radio(
-    "Select Source", settings.SOURCES_LIST)
+    # Load Pre-trained ML Model
+    try:
+        model = helper.load_model(model_path)
+    except Exception as ex:
+        st.error(f"Unable to load model. Check the specified path: {model_path}")
+        st.error(ex)
 
-source_img = None
-# If image is selected
-if source_radio == settings.IMAGE:
-    source_img = st.sidebar.file_uploader(
-        "Choose an image...", type=("jpg", "jpeg", "png", 'bmp', 'webp'))
+    st.sidebar.header("Image/Video Config")
+    source_radio = st.sidebar.radio(
+        "Select Source", settings.SOURCES_LIST)
 
-    col1, col2 = st.columns(2)
+    source_img = None
+    # If image is selected
+    if source_radio == settings.IMAGE:
+        source_img = st.sidebar.file_uploader(
+            "Choose an image...", type=("jpg", "jpeg", "png", 'bmp', 'webp'))
 
-    with col1:
-        try:
+        col1, col2 = st.columns(2)
+
+        with col1:
+            try:
+                if source_img is None:
+                    default_image_path = str(settings.DEFAULT_IMAGE)
+                    default_image = PIL.Image.open(default_image_path)
+                    st.image(default_image_path, caption="Default Image",
+                            use_column_width=True)
+                else:
+                    uploaded_image = PIL.Image.open(source_img)
+                    st.image(source_img, caption="Uploaded Image",
+                            use_column_width=True)
+            except Exception as ex:
+                st.error("Error occurred while opening the image.")
+                st.error(ex)
+
+        with col2:
             if source_img is None:
-                default_image_path = str(settings.DEFAULT_IMAGE)
-                default_image = PIL.Image.open(default_image_path)
-                st.image(default_image_path, caption="Default Image",
-                         use_column_width=True)
+                default_detected_image_path = str(settings.DEFAULT_DETECT_IMAGE)
+                default_detected_image = PIL.Image.open(
+                    default_detected_image_path)
+                st.image(default_detected_image_path, caption='Detected Image',
+                        use_column_width=True)
             else:
-                uploaded_image = PIL.Image.open(source_img)
-                st.image(source_img, caption="Uploaded Image",
-                         use_column_width=True)
-        except Exception as ex:
-            st.error("Error occurred while opening the image.")
-            st.error(ex)
+                if st.sidebar.button('Detect Objects'):
+                    res = model.predict(uploaded_image,
+                                        conf=confidence
+                                        )
+                    boxes = res[0].boxes
+                    res_plotted = res[0].plot()[:, :, ::-1]
+                    st.image(res_plotted, caption='Detected Image',
+                            use_column_width=True)
+                    try:
+                        with st.expander("Detection Results"):
+                            for box in boxes:
+                                st.write(box.data)
+                    except Exception as ex:
+                        # st.write(ex)
+                        st.write("No image is uploaded yet!")
 
-    with col2:
-        if source_img is None:
-            default_detected_image_path = str(settings.DEFAULT_DETECT_IMAGE)
-            default_detected_image = PIL.Image.open(
-                default_detected_image_path)
-            st.image(default_detected_image_path, caption='Detected Image',
-                     use_column_width=True)
-        else:
-            if st.sidebar.button('Detect Objects'):
-                res = model.predict(uploaded_image,
-                                    conf=confidence
-                                    )
-                boxes = res[0].boxes
-                res_plotted = res[0].plot()[:, :, ::-1]
-                st.image(res_plotted, caption='Detected Image',
-                         use_column_width=True)
-                try:
-                    with st.expander("Detection Results"):
-                        for box in boxes:
-                            st.write(box.data)
-                except Exception as ex:
-                    # st.write(ex)
-                    st.write("No image is uploaded yet!")
+    elif source_radio == settings.VIDEO:
+        helper.play_stored_video(confidence, model)
 
-elif source_radio == settings.VIDEO:
-    helper.play_stored_video(confidence, model)
+    elif source_radio == settings.WEBCAM:
+        helper.play_webcam(confidence, model)
 
-elif source_radio == settings.WEBCAM:
-    helper.play_webcam(confidence, model)
+    elif source_radio == settings.RTSP:
+        helper.play_rtsp_stream(confidence, model)
 
-elif source_radio == settings.RTSP:
-    helper.play_rtsp_stream(confidence, model)
-
-elif source_radio == settings.YOUTUBE:
-    helper.play_youtube_video(confidence, model)
-elif source_radio == settings.ENCROACHMENT:
-    helper.enchroachment()
-elif source_radio == settings.JUNCTION:  
-    helper.junctionEvaluationDataset()
-elif source_radio == settings.JUNCTIONEVAL:
-    helper.junctionEvaluation()
-elif source_radio == settings.BENCHMARKING:
-    helper.BenchMarking()
-else:
-    st.error("Please select a valid source type!")
+    elif source_radio == settings.YOUTUBE:
+        helper.play_youtube_video(confidence, model)
+    elif source_radio == settings.ENCROACHMENT:
+        helper.enchroachment()
+    elif source_radio == settings.JUNCTION:  
+        helper.junctionEvaluationDataset()
+    elif source_radio == settings.JUNCTIONEVAL:
+        helper.junctionEvaluation()
+    elif source_radio == settings.BENCHMARKING:
+        helper.benchMarking()
+    else:
+        st.error("Please select a valid source type!")
