@@ -160,8 +160,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytube==15.0.0
 pytz==2024.1
-pytz-deprecation-shim==0.1.0.post0
-pywin32
+pytz-deprecation-shim
 pywin32-ctypes==0.2.2
 PyYAML==6.0.1
 pyzmq==23.2.1
