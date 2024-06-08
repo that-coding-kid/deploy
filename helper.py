@@ -5,12 +5,12 @@ import cv2
 from pytube import YouTube
 import supervision as sv
 import ffmpeg
-
+from tqdm import tqdm
 import settings
 import argparse
 import json
 import os
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Dict, Iterable, List, Set
 import shutil
 import sys
 import cv2
@@ -112,6 +112,172 @@ class CustomSink:
             )
         cv2.imshow("Processed Video", annotated_frame)
         cv2.waitKey(1)
+        
+class DetectionsManager:
+    def __init__(self) -> None:
+        self.tracker_id_to_zone_id: Dict[int, int] = {}
+        self.counts: Dict[int, Dict[int, Set[int]]] = {}
+
+    def update(
+        self,
+        detections_all: sv.Detections,
+        detections_in_zones: List[sv.Detections],
+        detections_out_zones: List[sv.Detections],
+    ) -> sv.Detections:
+        for zone_in_id, detections_in_zone in enumerate(detections_in_zones):
+            for tracker_id in detections_in_zone.tracker_id:
+                self.tracker_id_to_zone_id.setdefault(tracker_id, zone_in_id)
+
+        for zone_out_id, detections_out_zone in enumerate(detections_out_zones):
+            for tracker_id in detections_out_zone.tracker_id:
+                if tracker_id in self.tracker_id_to_zone_id:
+                    zone_in_id = self.tracker_id_to_zone_id[tracker_id]
+                    self.counts.setdefault(zone_out_id, {})
+                    self.counts[zone_out_id].setdefault(zone_in_id, set())
+                    self.counts[zone_out_id][zone_in_id].add(tracker_id)
+        if len(detections_all) > 0:
+            detections_all.class_id = np.vectorize(
+                lambda x: self.tracker_id_to_zone_id.get(x, -1)
+            )(detections_all.tracker_id)
+        else:
+            detections_all.class_id = np.array([], dtype=int)
+        return detections_all[detections_all.class_id != -1]
+
+
+def initiate_polygon_zones(
+    polygons: List[np.ndarray],
+    triggering_anchors: Iterable[sv.Position] = [sv.Position.CENTER],
+) -> List[sv.PolygonZone]:
+    return [
+        sv.PolygonZone(
+            polygon=polygon,
+            triggering_anchors=triggering_anchors,
+        )
+        for polygon in polygons
+    ]
+    
+    
+class VideoProcessor:
+    def __init__(
+        self,
+        source_weights_path: str,
+        source_video_path: str,
+        zoneIN_configuration_path: str,
+        zoneOUT_configuration_path: str,
+        target_video_path: str = None,
+        confidence_threshold: float = 0.3,
+        iou_threshold: float = 0.7,
+    ) -> None:
+        self.conf_threshold = confidence_threshold
+        self.iou_threshold = iou_threshold
+        self.source_video_path = source_video_path
+        self.target_video_path = target_video_path
+        self.zoneIN_configuration_path = zoneIN_configuration_path
+        self.zoneOUT_configuration_path = zoneOUT_configuration_path
+        self.model = YOLO(source_weights_path)
+        self.tracker = sv.ByteTrack()
+
+        self.video_info = sv.VideoInfo.from_video_path(source_video_path)
+        ZONE_IN_POLYGONS = load_zones_config(file_path=zoneIN_configuration_path)
+        ZONE_OUT_POLYGONS = load_zones_config(file_path=zoneOUT_configuration_path)
+
+        self.zones_in = initiate_polygon_zones(ZONE_IN_POLYGONS, [sv.Position.CENTER])
+        self.zones_out = initiate_polygon_zones(ZONE_OUT_POLYGONS, [sv.Position.CENTER])
+
+        self.bounding_box_annotator = sv.BoundingBoxAnnotator(color=COLORS)
+        self.label_annotator = sv.LabelAnnotator(
+            color=COLORS, text_color=sv.Color.BLACK
+        )
+        self.trace_annotator = sv.TraceAnnotator(
+            color=COLORS, position=sv.Position.CENTER, trace_length=100, thickness=2
+        )
+        self.detections_manager = DetectionsManager()
+
+    def process_video(self):
+        frame_generator = sv.get_video_frames_generator(
+            source_path=self.source_video_path
+        )
+        vid_cap = cv2.VideoCapture(self.source_video_path)
+        st_frame = st.empty()
+        while(vid_cap.isOpened()):
+            success = vid_cap.read()
+            if(success):
+                if self.target_video_path:
+                    with sv.VideoSink(self.target_video_path, self.video_info) as sink:
+                        for frame in tqdm(frame_generator, total=self.video_info.total_frames):
+                            annotated_frame = self.process_frame(frame)
+                            sink.write_frame(annotated_frame)
+                else:
+                    for frame in tqdm(frame_generator, total=self.video_info.total_frames):
+                        annotated_frame = self.process_frame(frame)
+                        st_frame.image(annotated_frame,
+                                   caption='Detected Video',
+                                   channels="BGR",
+                                   use_column_width=True)
+                vid_cap.release()
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+            cv2.destroyAllWindows()
+
+    def annotate_frame(
+        self, frame: np.ndarray, detections: sv.Detections
+    ) -> np.ndarray:
+        annotated_frame = frame.copy()
+        for i, (zone_in, zone_out) in enumerate(zip(self.zones_in, self.zones_out)):
+            annotated_frame = sv.draw_polygon(
+                annotated_frame, zone_in.polygon, COLORS.colors[i]
+            )
+            annotated_frame = sv.draw_polygon(
+                annotated_frame, zone_out.polygon, COLORS.colors[i]
+            )
+
+        labels = [f"#{tracker_id}" for tracker_id in detections.tracker_id]
+        annotated_frame = self.trace_annotator.annotate(annotated_frame, detections)
+        annotated_frame = self.bounding_box_annotator.annotate(
+            annotated_frame, detections
+        )
+        annotated_frame = self.label_annotator.annotate(
+            annotated_frame, detections, labels
+        )
+
+        for zone_out_id, zone_out in enumerate(self.zones_out):
+            zone_center = sv.get_polygon_center(polygon=zone_out.polygon)
+            if zone_out_id in self.detections_manager.counts:
+                counts = self.detections_manager.counts[zone_out_id]
+                for i, zone_in_id in enumerate(counts):
+                    count = len(self.detections_manager.counts[zone_out_id][zone_in_id])
+                    text_anchor = sv.Point(x=zone_center.x, y=zone_center.y + 40 * i)
+                    annotated_frame = sv.draw_text(
+                        scene=annotated_frame,
+                        text=str(count),
+                        text_anchor=text_anchor,
+                        background_color=COLORS.colors[zone_in_id],
+                    )
+
+        return annotated_frame
+
+    def process_frame(self, frame: np.ndarray) -> np.ndarray:
+        results = self.model(
+            frame, verbose=False, conf=self.conf_threshold, iou=self.iou_threshold
+        )[0]
+        detections = sv.Detections.from_ultralytics(results)
+        detections.class_id = np.zeros(len(detections))
+        detections = self.tracker.update_with_detections(detections)
+
+        detections_in_zones = []
+        detections_out_zones = []
+
+        for zone_in, zone_out in zip(self.zones_in, self.zones_out):
+            detections_in_zone = detections[zone_in.trigger(detections=detections)]
+            detections_in_zones.append(detections_in_zone)
+            detections_out_zone = detections[zone_out.trigger(detections=detections)]
+            detections_out_zones.append(detections_out_zone)
+
+        detections = self.detections_manager.update(
+            detections, detections_in_zones, detections_out_zones
+        )
+        return self.annotate_frame(frame, detections)
+    
 
 class JunctionEvaluation:
     
@@ -139,15 +305,6 @@ def startup():
 
          
 def load_model(model_path):
-    """
-    Loads a YOLO object detection model from the specified model_path.
-
-    Parameters:
-        model_path (str): The path to the YOLO model file.
-
-    Returns:
-        A YOLO object detection model.
-    """
     model = YOLO(model_path)
     return model
 
@@ -162,19 +319,6 @@ def display_tracker_options():
 
 
 def _display_detected_frames(conf, model, st_frame, image, is_display_tracking=None, tracker=None):
-    """
-    Display the detected objects on a video frame using the YOLOv8 model.
-
-    Args:
-    - conf (float): Confidence threshold for object detection.
-    - model (YoloV8): A YOLOv8 object detection model.
-    - st_frame (Streamlit object): A Streamlit object to display the detected video.
-    - image (numpy array): A numpy array representing the video frame.
-    - is_display_tracking (bool): A flag indicating whether to display object tracking (default=None).
-
-    Returns:
-    None
-    """
 
     # Resize the image to a standard size
     image = cv2.resize(image, (720, int(720*(9/16))))
@@ -196,19 +340,7 @@ def _display_detected_frames(conf, model, st_frame, image, is_display_tracking=N
 
 
 def play_youtube_video(conf, model):
-    """
-    Plays a webcam stream. Detects Objects in real-time using the YOLOv8 object detection model.
 
-    Parameters:
-        conf: Confidence of YOLOv8 model.
-        model: An instance of the `YOLOv8` class containing the YOLOv8 model.
-
-    Returns:
-        None
-
-    Raises:
-        None
-    """
     source_youtube = st.sidebar.text_input("YouTube Video url")
 
     is_display_tracker, tracker = display_tracker_options()
@@ -238,19 +370,6 @@ def play_youtube_video(conf, model):
 
 
 def play_rtsp_stream(conf, model):
-    """
-    Plays an rtsp stream. Detects Objects in real-time using the YOLOv8 object detection model.
-
-    Parameters:
-        conf: Confidence of YOLOv8 model.
-        model: An instance of the `YOLOv8` class containing the YOLOv8 model.
-
-    Returns:
-        None
-
-    Raises:
-        None
-    """
     source_rtsp = st.sidebar.text_input("rtsp stream url:")
     st.sidebar.caption('Example URL: rtsp://admin:12345@192.168.1.210:554/Streaming/Channels/101')
     is_display_tracker, tracker = display_tracker_options()
@@ -280,19 +399,6 @@ def play_rtsp_stream(conf, model):
 
 
 def play_webcam(conf, model):
-    """
-    Plays a webcam stream. Detects Objects in real-time using the YOLOv8 object detection model.
-
-    Parameters:
-        conf: Confidence of YOLOv8 model.
-        model: An instance of the `YOLOv8` class containing the YOLOv8 model.
-
-    Returns:
-        None
-
-    Raises:
-        None
-    """
     source_webcam = settings.WEBCAM_PATH
     is_display_tracker, tracker = display_tracker_options()
     if st.sidebar.button('Detect Objects'):
@@ -319,16 +425,22 @@ def enchroachment():
     source_vid = st.sidebar.selectbox(
     "Choose a video...", settings.VIDEOS_DICT.keys())
     source_path = str(settings.VIDEOS_DICT.get(source_vid))
+    print(source_path)
     time = st.sidebar.text_input("Violation Time:")
     source_url = st.sidebar.text_input("Source Url:")
-    
+
     if st.sidebar.button("Generate Bottleneck Alerts"):
         if(source_url): 
-            livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path="configure/config.json")
+            zones_configuration_path = "configure/ZONES"+source_url+".json" 
+            livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path=zones_configuration_path)
         else:
-            #drawzones(source_path = source_path, zone_configuration_path = "configure/config.json")
-            timedetect(source_path = source_path, zone_configuration_path = "configure/config.json", violation_time=time)
-        
+            new_path = source_path.split("\\")[-1]
+            zones_configuration_path = "configure/ZONES"+new_path+".json" 
+            if(os.path.exists(zones_configuration_path)):
+                timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
+            else:
+                drawzones(source_path = source_path, zone_configuration_path = zones_configuration_path)
+                timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
 def junctionEvaluationDataset():
     source_vid = st.sidebar.selectbox(
     "Choose a video...", settings.VIDEOS_DICT.keys())
@@ -353,44 +465,9 @@ def junctionEvaluationDataset():
         else:
             jxnEvalInstance = JunctionEvaluation(source_path)
             returnPath = jxnEvalInstance.datasetCreation(cycle=cycle)
-            st.sidebar.write("Dataset Created Successfully at "+returnPath)
-            
-def BenchMarking():
-
-
-    source_vid = st.sidebar.selectbox(
-        "Choose a video...", settings.VIDEOS_DICT.keys())
-
-    is_display_tracker, tracker = display_tracker_options()
-
-    with open(settings.VIDEOS_DICT[source_vid], 'rb') as video_file:
-        video_bytes = video_file.read()
-    if video_bytes:
-        st.video(video_bytes)
-
-    # try:
-    #     threshold = int(threshold)
-    #     if (threshold > 5 or threshold < 1):
-    #         st.sidebar.error("Enter a valid value")
-    #     else:
-    #         if st.sidebar.button("Start Evaluation"):
-    #             returnVid = jxnEvalFunc(threshold)
-    #             is_display_tracker, tracker = display_tracker_options()
-
-    #             with open(returnVid, 'rb') as video_file:
-    #                 video_bytes = video_file.read()
-                    
-    #             if video_bytes:
-    #                 st.video(video_bytes)
-                                                        
-    # except:
-    #     st.sidebar.error("Enter a valid integer")            
-        
-            
-            
-        
+            st.sidebar.write("Dataset Created Successfully at "+returnPath)        
 def junctionEvaluation():
-    if (len(settings.EVALUATION_DICT.keys()) == 0 ):
+    if (len(settings.EVALUATION_DICT.keys()) == 0):
         st.sidebar.error("Create a dataset first")
     else:
         source_dir = st.sidebar.selectbox(
@@ -609,7 +686,7 @@ def timedetect(source_path, zone_configuration_path, violation_time):
     LABEL_ANNOTATOR = sv.LabelAnnotator(
     color=COLORS, text_color=sv.Color.from_hex("#000000")
     )
-    model_id = "yolov8x-640"
+    model_id = "yolov8m-640"
     classes = [2,5,6,7]
     confidence = 0.3
     iou = 0.7
@@ -673,12 +750,7 @@ def timedetect(source_path, zone_configuration_path, violation_time):
                                     if(time%60 >= int(violation_time)):
                                         violations.append(tracker_ID)
                                         cla = settings.CLASSES[cl]
-                                        try:
-                                            vid = ffmpeg.probe(source_path)
-                                            location = vid["location"]
-                                        except:
-                                            location = "Meta data doesn't contain location"
-                                        s = "Tracker_ID:" + str(tracker_ID) + " Class: " + cla + " Location: " + location
+                                        s = "Tracker_ID:" + str(tracker_ID) + " Class: " + cla + " Location: CrossingX "
                                         st.warning(s, icon= "⚠️")
                                         displayed[tracker_ID] = 1
                         
@@ -724,7 +796,7 @@ def liveevaluation(source_url: str, zone_configuration_path: str):
     confidence = 0.3
     iou = 0.7
     model = YOLO('weights\yolov8n.pt')
-    sink = CustomSink(zone_configuration_path=zone_configuration_path, classes=classes, violation_time = violation_time)
+    sink = CustomSink(zone_configuration_path=zone_configuration_path, classes=classes)
 
     pipeline = InferencePipeline.init(
         model_id=model_id,
@@ -742,3 +814,29 @@ def liveevaluation(source_url: str, zone_configuration_path: str):
         pipeline.terminate()
 
 
+
+def benchMarking():
+    source_vid = st.sidebar.selectbox(
+    "Choose a video...", settings.VIDEOS_DICT.keys())
+    source_path = str(settings.VIDEOS_DICT.get(source_vid))
+    new_path = source_path.split("\\")[-1]
+    zones_IN_configuration_path = "configure/ZONES_IN"+new_path+".json"
+    zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
+    if(st.sidebar.button("Draw Zones IN")):
+        drawzones(source_path = source_path, zone_configuration_path = zones_IN_configuration_path)
+        st.sidebar.write("ZONES_IN created successfully at "+zones_IN_configuration_path)
+    
+    if(st.sidebar.button("Draw Zones OUT")):    
+        drawzones(source_path = source_path, zone_configuration_path = zones_OUT_configuration_path)
+        st.sidebar.write("ZONES_OUT created successfully at "+zones_OUT_configuration_path)
+
+    if(st.sidebar.button("BenchMark")):
+        processor = VideoProcessor(
+        source_weights_path="weights\yolov8n.pt",
+        source_video_path=source_path,
+        zoneIN_configuration_path=zones_IN_configuration_path,
+        zoneOUT_configuration_path=zones_OUT_configuration_path    
+    )
+        processor.process_video()
+
+        
