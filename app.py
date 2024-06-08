@@ -1,6 +1,7 @@
 # Python In-built packages
 from pathlib import Path
 import PIL
+
 # External packages
 import streamlit as st
 from streamlit_login_auth_ui.widgets import __login__
@@ -17,7 +18,8 @@ st.set_page_config(
         initial_sidebar_state="expanded"
     )
 st.title("S.A.D.A.K")
-__login__obj = __login__(auth_token = "pk_prod_PVY78PYNS84M1SPFKZSCHD1D32BS", 
+
+__login__obj = __login__(auth_token = settings.COURIER_API_KEY, 
                     company_name = "S.A.D.A.K",
                     width = 200, height = 250, 
                     logout_button_name = 'Logout', hide_menu_bool = False, 
