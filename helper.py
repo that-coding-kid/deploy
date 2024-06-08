@@ -428,16 +428,14 @@ def enchroachment():
     print(source_path)
     time = st.sidebar.text_input("Violation Time:")
     source_url = st.sidebar.text_input("Source Url:")
-    cwd = os.getcwd()
     if st.sidebar.button("Generate Bottleneck Alerts"):
         if(source_url): 
             zones_configuration_path = "configure/ZONES"+source_url+".json" 
-            zones_configuration_path = os.path.join(cwd,zones_configuration_path)
             livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path=zones_configuration_path)
         else:
             new_path = source_path.split("\\")[-1]
             zones_configuration_path = "configure/ZONES"+new_path+".json" 
-            zones_configuration_path = os.path.join(cwd,zones_configuration_path)
+
             if(os.path.exists(zones_configuration_path)):
                 timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
             else:
@@ -859,9 +857,7 @@ def benchMarking():
     new_path = source_path.split("/")[-1]
     zones_IN_configuration_path = "configure/ZONES_IN"+new_path+".json"
     zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
-    cwd = os.getcwd()
     weight_path = "weights/yolov8n.pt"
-    weight_path = os.path.join(cwd,weight_path)
     if(st.sidebar.button("Draw Zones IN")):
         drawzones(source_path = source_path, zone_configuration_path = zones_IN_configuration_path)
         st.sidebar.write("ZONES_IN created successfully at "+zones_IN_configuration_path)
