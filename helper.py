@@ -433,14 +433,9 @@ def enchroachment():
             zones_configuration_path = "configure/ZONES"+source_url+".json" 
             livedetection(source_url=source_url, violation_time=int(time), zone_configuration_path=zones_configuration_path)
         else:
-            new_path = source_path.split("\\")[-1]
+            new_path = source_path.split("/")[-1]
             zones_configuration_path = "configure/ZONES"+new_path+".json" 
-
-            if(os.path.exists(zones_configuration_path)):
-                timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
-            else:
-                drawzones(source_path = source_path, zone_configuration_path = zones_configuration_path)
-                timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
+            timedetect(source_path = source_path, zone_configuration_path = zones_configuration_path, violation_time=time)
 def junctionEvaluationDataset():
     source_vid = st.sidebar.selectbox(
     "Choose a video...", settings.VIDEOS_DICT.keys())
