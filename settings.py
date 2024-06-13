@@ -22,7 +22,7 @@ JUNCTION = 'Junction Evaluation Dataset'
 JUNCTIONEVAL = 'Junction Evaluation'
 BENCHMARKING = "Benchmarking"
 SOURCES_LIST = [IMAGE, VIDEO, RTSP, YOUTUBE, ENCROACHMENT, JUNCTION, JUNCTIONEVAL,BENCHMARKING]
-os.environ['COURIER_API_KEY'] = st.secrets['COURIER_API_KEY']
+COURIER_API_KEY= st.secrets['COURIER_API_KEY']
 
 # Images config
 IMAGES_DIR = ROOT / 'images'
