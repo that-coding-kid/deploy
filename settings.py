@@ -14,15 +14,14 @@ if ROOT not in sys.path:
 # Sources
 IMAGE = 'Image'
 VIDEO = 'Video'
-WEBCAM = 'Webcam'
 RTSP = 'RTSP'
 YOUTUBE = 'YouTube'
 ENCROACHMENT = 'Encroachment'
 JUNCTION = 'Junction Evaluation Dataset'
 JUNCTIONEVAL = 'Junction Evaluation'
 BENCHMARKING = "Benchmarking"
-SOURCES_LIST = [IMAGE, VIDEO, WEBCAM, RTSP, YOUTUBE, ENCROACHMENT, JUNCTION, JUNCTIONEVAL,BENCHMARKING]
-os.environ['COURIER_API_KEY'] = st.secrets['COURIER_API_KEY']
+SOURCES_LIST = [IMAGE, VIDEO, RTSP, YOUTUBE, ENCROACHMENT, JUNCTION, JUNCTIONEVAL,BENCHMARKING]
+
 # Images config
 IMAGES_DIR = ROOT / 'images'
 DEFAULT_IMAGE = IMAGES_DIR / 'default.png'
@@ -138,7 +137,7 @@ def updateDirectories():
     FINAL_DICT = {}
     VIDEO_DIR = ROOT / 'videos'
 
-    # VIDEOS_DICT = {
+    VIDEOS_DICT = {'video_5': VIDEO_DIR/'Footage_Feed_5.MP4' }
     #     'video_1': VIDEO_DIR /'video_1.mp4',
     #     'video_2': VIDEO_DIR /'video_2.mp4',
     #     'video_3': VIDEO_DIR /'video_3.mp4',
@@ -163,13 +162,8 @@ def updateDirectories():
     EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset'
     for filename in os.listdir(EVALUATION_DIR):
         f = os.path.join(EVALUATION_DIR, filename)
-        if (len(f)<5):
-            continue
-        else:
-            if (f[-4] != "."):
-                pass
-            else:
-                EVALUATION_DICT[filename] = f
+        # checking if it is a file
+        EVALUATION_DICT[filename] = f
 
     for i in EVALUATION_DICT.keys():
         print(i,EVALUATION_DICT[i])
@@ -181,7 +175,7 @@ def updateDirectories():
             f = os.path.join(i, filename)
             # checking if it is a file
             try:
-                if(filename[-4:]==".mp4"):
+                if(filename[-4:].lower()==".mp4"):
                     newDict[filename] = f
                 else:
                     pass
@@ -209,7 +203,8 @@ def updateDirectories():
     print(DETECTION_MODEL)
 
     # Webcam
-    WEBCAM_PATH = 0
+    DATASET_DIR = ROOT/"Dataset"
+
 
 
         

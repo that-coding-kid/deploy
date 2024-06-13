@@ -1,11 +1,10 @@
 # Python In-built packages
 from pathlib import Path
 import PIL
-
 # External packages
 import streamlit as st
 from streamlit_login_auth_ui.widgets import __login__
-
+from structures.essentials import load_model
 # Local Modules
 import settings
 import helper
@@ -18,8 +17,7 @@ st.set_page_config(
         initial_sidebar_state="expanded"
     )
 st.title("S.A.D.A.K")
-
-__login__obj = __login__(auth_token = settings.COURIER_API_KEY, 
+__login__obj = __login__(auth_token = "pk_prod_PVY78PYNS84M1SPFKZSCHD1D32BS", 
                     company_name = "S.A.D.A.K",
                     width = 200, height = 250, 
                     logout_button_name = 'Logout', hide_menu_bool = False, 
@@ -48,7 +46,7 @@ if LOGGED_IN == True:
 
     # Load Pre-trained ML Model
     try:
-        model = helper.load_model(model_path)
+        model = load_model(model_path)
     except Exception as ex:
         st.error(f"Unable to load model. Check the specified path: {model_path}")
         st.error(ex)
@@ -107,20 +105,21 @@ if LOGGED_IN == True:
     elif source_radio == settings.VIDEO:
         helper.play_stored_video(confidence, model)
 
-    elif source_radio == settings.WEBCAM:
-        helper.play_webcam(confidence, model)
-
     elif source_radio == settings.RTSP:
         helper.play_rtsp_stream(confidence, model)
 
     elif source_radio == settings.YOUTUBE:
         helper.play_youtube_video(confidence, model)
+        
     elif source_radio == settings.ENCROACHMENT:
         helper.enchroachment()
+        
     elif source_radio == settings.JUNCTION:  
         helper.junctionEvaluationDataset()
+        
     elif source_radio == settings.JUNCTIONEVAL:
         helper.junctionEvaluation()
+        
     elif source_radio == settings.BENCHMARKING:
         helper.benchMarking()
     else:
