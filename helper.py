@@ -241,7 +241,7 @@ def benchMarking():
     
     time = st.sidebar.text_input("Time Interval for Accuracy Analysis (in minutes):")
     choice = st.sidebar.radio("Choose benchmarking criteria", ["Flow", "Queue Length"])
-    new_path = source_path.split("\\")[-1]
+    new_path = source_path.split("/")[-1]
     zones_IN_configuration_path = "configure/ZONES_IN"+new_path+".json"
     zones_OUT_configuration_path = "configure/ZONES_OUT"+new_path+".json"
     weight_path = "weights/yolov8n.pt"
