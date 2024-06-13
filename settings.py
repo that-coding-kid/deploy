@@ -161,29 +161,29 @@ def updateDirectories():
         print(i,VIDEOS_DICT[i])
 
 
-    EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset'
-    for filename in os.listdir(EVALUATION_DIR):
-        f = os.path.join(EVALUATION_DIR, filename)
+    #EVALUATION_DIR = VIDEO_DIR / 'junctionEvalDataset'
+    #for filename in os.listdir(EVALUATION_DIR):
+    #    f = os.path.join(EVALUATION_DIR, filename)
         # checking if it is a file
-        EVALUATION_DICT[filename] = f
+    #    EVALUATION_DICT[filename] = f
 
-    for i in EVALUATION_DICT.keys():
-        print(i,EVALUATION_DICT[i])
+    #for i in EVALUATION_DICT.keys():
+     #   print(i,EVALUATION_DICT[i])
 
 
-    for i in EVALUATION_DICT.keys():
-        newDict = {}
-        for filename in os.listdir(EVALUATION_DICT[i]):
-            f = os.path.join(i, filename)
+    #for i in EVALUATION_DICT.keys():
+    #    newDict = {}
+     #   for filename in os.listdir(EVALUATION_DICT[i]):
+      #      f = os.path.join(i, filename)
             # checking if it is a file
-            try:
-                if(filename[-4:].lower()==".mp4"):
-                    newDict[filename] = f
-                else:
-                    pass
-            except:
-                pass  
-        FINAL_DICT[i] = newDict
+       #     try:
+        #        if(filename[-4:].lower()==".mp4"):
+         #           newDict[filename] = f
+          #      else:
+           #         pass
+            #except:
+             #   pass  
+        #FINAL_DICT[i] = newDict
 
 
     # EVALUATION_DICT = {
