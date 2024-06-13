@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 import supervision as sv
 import os
+import streamlit as st
 # Get the absolute path of the current file
 FILE = Path(__file__).resolve()
 # Get the parent directory of the current file
@@ -21,6 +22,7 @@ JUNCTION = 'Junction Evaluation Dataset'
 JUNCTIONEVAL = 'Junction Evaluation'
 BENCHMARKING = "Benchmarking"
 SOURCES_LIST = [IMAGE, VIDEO, RTSP, YOUTUBE, ENCROACHMENT, JUNCTION, JUNCTIONEVAL,BENCHMARKING]
+os.environ['COURIER_API_KEY'] = st.secrets['COURIER_API_KEY']
 
 # Images config
 IMAGES_DIR = ROOT / 'images'
